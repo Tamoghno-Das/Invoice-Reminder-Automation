@@ -55,11 +55,11 @@ A full walkthrough of the workflow running end-to-end is included in this reposi
 
 > **Note for viewing on GitHub:** GitHub renders inline video playback for files committed directly to the repo, but if it doesn't autoplay in your browser, use the link above to download it, or open the raw file. For guaranteed inline playback in the README preview, you can alternatively drag-and-drop the `.mp4` into a new GitHub Issue/Discussion comment — GitHub will host it on its CDN and generate a permanent, always-playable `<video>` embed link you can paste in place of the tag above.
 
-**[▶ Download / Watch the Demo Video](
+**[▶ Download / Watch the Demo Video]**
 
 https://github.com/user-attachments/assets/dd99c28c-1e0d-4748-ab1b-af1e4870debc
 
-)**
+
 
 ---
 
@@ -82,9 +82,11 @@ https://github.com/user-attachments/assets/dd99c28c-1e0d-4748-ab1b-af1e4870debc
 
 The entire pipeline is a single visual n8n workflow. The diagram below is the actual workflow canvas from this repository:
 
-![Invoice Reminder Automation – n8n Workflow Diagram](assets/workflow-diagram.png)
+![Invoice Reminder Automation – n8n Workflow Diagram](<img width="1599" height="775" alt="image" src="https://github.com/user-attachments/assets/8ecdb9ab-0d2f-4929-a1ef-609279f31774" />)
 
-### Node-by-node breakdown
+
+### Node-by-node breakdown[Invoice Reminder .xlsx](https://github.com/user-attachments/files/31142779/Invoice.Reminder.xlsx)
+
 
 | # | Node | Type | Purpose |
 |---|---|---|---|
@@ -148,7 +150,7 @@ The **Select Reminder Stage** node classifies each unpaid invoice into one of si
 
 ## 📊 Data Source Schema
 
-The workflow reads from a spreadsheet with the following columns. A ready-to-use template is included at [`data/Invoice_Reminder_Template.xlsx`](data/Invoice_Reminder_Template.xlsx).
+The workflow reads from a spreadsheet with the following columns. A ready-to-use template is included at [`data/Invoice_Reminder_Template.xlsx`]([Invoice Reminder .xlsx](https://github.com/user-attachments/files/31142798/Invoice.Reminder.xlsx)).
 
 | Column | Type | Description |
 |---|---|---|
@@ -168,8 +170,6 @@ The workflow reads from a spreadsheet with the following columns. A ready-to-use
 | INV-002 | XYZ PVT LTD | 85,000/- | 2026-08-15 | Paid |
 | INV-003 | JASOP CORP | 90,000/- | 2026-08-12 | Pending |
 | INV-004 | TECH SOLUTIONS | 35,000/- | 2026-08-09 | Pending |
-
-**[⬇ Download the Excel Template](data/Invoice_Reminder_Template.xlsx)**
 
 ---
 
