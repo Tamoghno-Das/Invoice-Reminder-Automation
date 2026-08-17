@@ -49,9 +49,9 @@ No manual tracking spreadsheets to babysit, no forgotten follow-ups, no generic 
 
 A full walkthrough of the workflow running end-to-end is included in this repository at [`assets/demo/invoice-automation-workflow.mp4`](assets/demo/invoice-automation-workflow.mp4).
 
-<video src="assets/demo/invoice-automation-workflow.mp4" controls width="100%">
+
   Your browser (or GitHub's preview) does not support inline video playback.
-  <a href="assets/demo/invoice-automation-workflow.mp4">Click here to download and watch the demo</a>.
+  <a href="[assets/demo/invoice-automation-workflow.mp4](https://github.com/user-attachments/assets/6c50c48c-cdd9-4ac9-bde7-30ed5eb3a192)">Click here to download and watch the demo</a>.
 </video>
 
 > **Note for viewing on GitHub:** GitHub renders inline video playback for files committed directly to the repo, but if it doesn't autoplay in your browser, use the link above to download it, or open the raw file. For guaranteed inline playback in the README preview, you can alternatively drag-and-drop the `.mp4` into a new GitHub Issue/Discussion comment — GitHub will host it on its CDN and generate a permanent, always-playable `<video>` embed link you can paste in place of the tag above.
