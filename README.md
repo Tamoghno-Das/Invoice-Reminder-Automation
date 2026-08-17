@@ -49,8 +49,6 @@ No manual tracking spreadsheets to babysit, no forgotten follow-ups, no generic 
 
 A full walkthrough of the workflow running end-to-end is included in this repository at [`assets/demo/invoice-automation-workflow.mp4`](assets/demo/invoice-automation-workflow.mp4).
 
-
-  Your browser (or GitHub's preview) does not support inline video playback.
   <a href="[assets/demo/invoice-automation-workflow.mp4](https://github.com/user-attachments/assets/6c50c48c-cdd9-4ac9-bde7-30ed5eb3a192)">Click here to download and watch the demo</a>.
 </video>
 
