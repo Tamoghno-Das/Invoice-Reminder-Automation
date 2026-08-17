@@ -292,8 +292,8 @@ This project is licensed under the **MIT License** — see the [LICENSE](LICENSE
 **Tamoghno Das**
 
 - GitHub: [@Tamoghno-Das](https://github.com/Tamoghno-Das)
-- Email: *your.email@example.com*
-- LinkedIn: *linkedin.com/in/your-profile*
+- Email: *https://github.com/Tamoghno-Das*
+- LinkedIn: *https://www.linkedin.com/in/tamoghno-das/*
 
 ---
 
