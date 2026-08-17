@@ -1,0 +1,570 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        -144
+      ],
+      "id": "f50ab050-c7b1-4dab-b7ed-fc8dd30dfd92",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1kP7PDBzqeYzSGm5E6Q0r6IOZ4ktKJTpHKPFVHLRrFgQ",
+          "mode": "list",
+          "cachedResultName": "Invoice Reminder ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kP7PDBzqeYzSGm5E6Q0r6IOZ4ktKJTpHKPFVHLRrFgQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kP7PDBzqeYzSGm5E6Q0r6IOZ4ktKJTpHKPFVHLRrFgQ/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        192,
+        -144
+      ],
+      "id": "9808dea0-767f-4e1e-b83a-377d35585868",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "BelxhdTUQ7hQnR5S",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "f79a636e-efb2-4357-b80a-6c52a33848f5",
+              "leftValue": "={{ $json[\"Payment Status \"] }}",
+              "rightValue": "Paid",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        416,
+        -144
+      ],
+      "id": "87f66462-025d-48c0-9d29-f839ffd1ebb7",
+      "name": "Filter Unpaid"
+    },
+    {
+      "parameters": {
+        "operation": "formatDate",
+        "date": "={{ $json['Due Date '] }}",
+        "format": "yyyy-MM-dd",
+        "outputFieldName": "formatted_due_date",
+        "options": {
+          "includeInputFields": true
+        }
+      },
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [
+        656,
+        -144
+      ],
+      "id": "4ccd58b2-e4b6-4917-a963-d9f30c6a3b14",
+      "name": "prepare due date "
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "164c088f-8ef1-4003-98ef-51d505e583e3",
+              "name": "days_until_due",
+              "value": "={{ DateTime.fromISO($json.formatted_due_date).startOf('day').diff(DateTime.now().startOf('day'), 'days').days }}",
+              "type": "number"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        896,
+        -144
+      ],
+      "id": "e90414c1-0cb4-4b88-bc51-15f8a2107b9a",
+      "name": "Calculate Days Until Due"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ef1de0f4-a87a-4443-a985-564f88b7c40f",
+              "name": "reminder_stage",
+              "value": "={{    $json.days_until_due === 7 ? \"PRE_DUE_7\" :   $json.days_until_due === 3 ? \"PRE_DUE_3\" :   $json.days_until_due === 0 ? \"DUE_TODAY\" :   $json.days_until_due === -3 ? \"OVERDUE_3\" :   $json.days_until_due === -7 ? \"OVERDUE_7\" :   $json.days_until_due === -14 ? \"OVERDUE_14\" :   $json.days_until_due === -30 ? \"OVERDUE_30\" :   \"NO_REMINDER\" }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        1120,
+        -144
+      ],
+      "id": "fc28ff2d-ed17-45a8-ad6d-edf7d3f4b2ea",
+      "name": "Determine Reminder Stage"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.reminder_stage }}",
+                    "rightValue": "PRE_DUE_7",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "55ef353f-8714-42c6-b3c5-9fa287a4e23b"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "7caf7a09-a208-4513-b665-ccd38bbfd1b7",
+                    "leftValue": "={{ $json.reminder_stage }}",
+                    "rightValue": "PRE_DUE_3",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "fd9a48b6-121d-41fc-adb4-0e4461fe9e1c",
+                    "leftValue": "={{ $json.reminder_stage }}",
+                    "rightValue": "DUE_TODAY",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "cfdffb61-af00-48a7-81f2-43dde84bb53c",
+                    "leftValue": "={{ $json.reminder_stage }}",
+                    "rightValue": "OVERDUE_3",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "54b5d721-4779-4de6-a206-ed074ebe52e2",
+                    "leftValue": "={{ $json.reminder_stage }}",
+                    "rightValue": "OVERDUE_7",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "a30c6649-8996-48ce-987e-b64b2d9eb983",
+                    "leftValue": "={{ $json.reminder_stage }}",
+                    "rightValue": "OVERDUE_30",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        16,
+        176
+      ],
+      "id": "67f99b5e-1fbc-42c0-8c95-c8049f97e0ea",
+      "name": "Select Reminder Stage"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Generate an invoice payment reminder using the following invoice data.\n\nInvoice ID: {{ $('prepare due date ').item.json['Invoice ID '] }}\nCustomer Name: {{ $('Get row(s) in sheet').item.json['Customer Name '] }}\nCustomer Email: {{ $('Get row(s) in sheet').item.json['Customer Email'] }}\nInvoice Amount: {{ $('Get row(s) in sheet').item.json['Invoice Amount '] }}\nInvoice Date: {{ $('Get row(s) in sheet').item.json['Invoice Date '] }}\nDue Date: {{ $('Get row(s) in sheet').item.json['Due Date '] }}\nPayment Status: {{ $('Get row(s) in sheet').item.json['Payment Status '] }}\nDays Until Due: {{ $('Calculate Days Until Due').item.json.days_until_due }}\nReminder Stage: {{ $json.reminder_stage }}\n\nCreate the appropriate reminder email according to the reminder stage.",
+        "options": {
+          "systemMessage": "You are an Accounts Receivable assistant responsible for generating professional invoice payment reminder emails.\n\nYour task is to create an appropriate reminder email based ONLY on the invoice information provided by the workflow.\n\nNever invent or change:\n- Invoice ID\n- Customer name\n- Invoice amount\n- Currency\n- Invoice date\n- Due date\n- Payment status\n- Payment links\n- Payment instructions\n\nUse the reminder stage to determine the tone.\n\nPRE_DUE_7:\nFriendly and helpful.\n\nPRE_DUE_3:\nFriendly but more direct.\n\nDUE_TODAY:\nProfessional and clear that payment is due today.\n\nOVERDUE_3:\nProfessional and politely firm.\n\nOVERDUE_7:\nFirm and urgent.\n\nOVERDUE_14:\nStrong and serious.\n\nOVERDUE_30:\nVery serious and suitable for escalation.\n\nThe email should:\n1. Address the customer by name.\n2. Mention the invoice ID.\n3. Mention the outstanding amount.\n4. Mention the due date.\n5. Clearly explain why the customer is receiving the email.\n6. Ask the customer to arrange payment.\n7. Include a polite closing.\n\nDo not claim that payment is overdue when the invoice is not overdue.\n\nReturn ONLY JSON in this exact structure:\n\n{\n  \"subject\": \"email subject\",\n  \"message\": \"email body\"\n}\n\nDo not include Markdown code fences."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        384,
+        176
+      ],
+      "id": "04db607e-7dab-46dc-8cc8-12a8c5db1ec1",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "93d578ab-960a-41eb-ad10-5786c40ab6ca",
+              "name": "email_subject",
+              "value": "={{ JSON.parse($json.output).subject }}",
+              "type": "string"
+            },
+            {
+              "id": "c09981b8-fa69-453d-b6f5-10ca605178d6",
+              "name": "email_message",
+              "value": "={{ JSON.parse($json.output).message }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        752,
+        176
+      ],
+      "id": "f0a23866-d6b7-40a2-aafb-a38dd35b2cc3",
+      "name": "prepare email"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Filter Unpaid').item.json['Customer Email'] }}",
+        "subject": "={{ $json.email_subject }}",
+        "emailType": "text",
+        "message": "={{ $json.email_message }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        976,
+        176
+      ],
+      "id": "be9d78ba-f173-4fe7-a677-c7943566a489",
+      "name": "Send Invoice Reminder",
+      "webhookId": "a853859e-4633-439d-ab2e-0871fc437098",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "AqrJfwN6MVQQQ4Qz",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        256,
+        384
+      ],
+      "id": "a5993e38-058e-4941-b263-638b17cf4cdb",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "sIRXndZmsKdukKZ8",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Filter Unpaid",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Unpaid": {
+      "main": [
+        [
+          {
+            "node": "prepare due date ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "prepare due date ": {
+      "main": [
+        [
+          {
+            "node": "Calculate Days Until Due",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate Days Until Due": {
+      "main": [
+        [
+          {
+            "node": "Determine Reminder Stage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Determine Reminder Stage": {
+      "main": [
+        [
+          {
+            "node": "Select Reminder Stage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Select Reminder Stage": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "prepare email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "prepare email": {
+      "main": [
+        [
+          {
+            "node": "Send Invoice Reminder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "0baa2165-2faa-4c58-bc61-a12bb4b2c36f",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a4709d98f0697b9b0108a4cfc29f821c67a9c168820004d7c4664a465b7e102a"
+  },
+  "nodeGroups": [],
+  "id": "JMptVbo7CFH5Pp2S",
+  "tags": []
+}
